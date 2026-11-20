@@ -4,6 +4,8 @@
 
 const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
+const formatINR = (amount) => `₹${Math.round(amount).toLocaleString("en-IN")}`;
+
 // --------------------------------------------------------------------------
 // 1. MAGNETIC WRAPPER COMPONENT
 // --------------------------------------------------------------------------
@@ -420,7 +422,7 @@ function BrewFinderSection({ onAddPairing }) {
       drink,
       pastry,
       rationale,
-      bundlePrice: ((drink.price + pastry.price) * 0.92).toFixed(2) // 8% ritual pairing privilege
+      bundlePrice: Math.round((drink.price + pastry.price) * 0.92) // 8% ritual pairing privilege
     };
   }, [boldness, tempPref, profile]);
 
@@ -622,7 +624,7 @@ function BrewFinderSection({ onAddPairing }) {
                   RITUAL PAIRING TOTAL
                 </span>
                 <span className="font-mono text-2xl font-extrabold text-[#0B0B0C]">
-                  ${recommendation.bundlePrice}
+                  {formatINR(recommendation.bundlePrice)}
                 </span>
               </div>
 
@@ -739,8 +741,8 @@ function UkusaApp() {
   // Customizer Modal state
   const [customizingItem, setCustomizingItem] = useState(null);
   const [customOptions, setCustomOptions] = useState({
-    milk: "Barista Oat (+0.75)",
-    milkCost: 0.75,
+    milk: "Barista Oat (+₹60)",
+    milkCost: 60,
     temp: "Hot",
     sweetness: "Unsweetened (100% Terroir)",
     extraShot: false,
@@ -754,7 +756,7 @@ function UkusaApp() {
       cartId: "init-1",
       id: "sig-01",
       name: "Smoked Black Sesame Latte",
-      price: 7.25,
+      price: 290,
       qty: 1,
       details: "Iced · Barista Oat · Smoked Sea Salt Foam",
       image: "https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=900&q=85"
@@ -901,8 +903,8 @@ function UkusaApp() {
     if (window.ukusaSound) window.ukusaSound.playClick();
     setCustomizingItem(item);
     setCustomOptions({
-      milk: "Barista Oat (+0.75)",
-      milkCost: item.isDrink ? 0.75 : 0,
+      milk: "Barista Oat (+₹60)",
+      milkCost: item.isDrink ? 60 : 0,
       temp: item.defaultTemp || "Hot",
       sweetness: "Unsweetened (100% Terroir)",
       extraShot: false,
@@ -915,7 +917,7 @@ function UkusaApp() {
     let total = customizingItem.price;
     if (customizingItem.isDrink) {
       total += customOptions.milkCost;
-      if (customOptions.extraShot) total += 1.5;
+      if (customOptions.extraShot) total += 50;
     }
     return total;
   }, [customizingItem, customOptions]);
@@ -956,7 +958,7 @@ function UkusaApp() {
         cartId: `${drink.id}-${Date.now()}-1`,
         id: drink.id,
         name: `${drink.name} (Pairing)`,
-        price: Number((drink.price * 0.92).toFixed(2)),
+        price: Math.round(drink.price * 0.92),
         qty: 1,
         details: `${tempPref} · Sommelier Calibrated`,
         image: drink.image
@@ -965,7 +967,7 @@ function UkusaApp() {
         cartId: `${pastry.id}-${Date.now()}-2`,
         id: pastry.id,
         name: `${pastry.name} (Pairing)`,
-        price: Number((pastry.price * 0.92).toFixed(2)),
+        price: Math.round(pastry.price * 0.92),
         qty: 1,
         details: "Warmed · Paired Ritual Privilege (-8%)",
         image: pastry.image
@@ -1500,7 +1502,7 @@ function UkusaApp() {
 
                   <div className="flex items-center gap-4 max-md:gap-3 flex-shrink-0">
                     <span className="font-mono text-2xl max-md:text-lg font-bold text-[#F4F3EF]">
-                      ${item.price.toFixed(2)}
+                      {formatINR(item.price)}
                     </span>
                     <span className="w-11 h-11 max-md:w-9 max-md:h-9 rounded-full border border-[#F4F3EF]/20 group-hover:bg-[#C85A32] group-hover:border-[#C85A32] flex items-center justify-center font-mono text-lg transition-all">
                       +
@@ -1759,10 +1761,10 @@ function UkusaApp() {
                     </label>
                     <div className="grid grid-cols-2 gap-2.5">
                       {[
-                        { label: "Barista Oat (+0.75)", cost: 0.75 },
-                        { label: "Hokkaido Whole (+0.00)", cost: 0 },
-                        { label: "Raw Macadamia (+1.00)", cost: 1.0 },
-                        { label: "Black / Pure (+0.00)", cost: 0 }
+                        { label: "Barista Oat (+₹60)", cost: 60 },
+                        { label: "Hokkaido Whole (+₹0)", cost: 0 },
+                        { label: "Raw Macadamia (+₹70)", cost: 70 },
+                        { label: "Black / Pure (+₹0)", cost: 0 }
                       ].map((m) => (
                         <button
                           key={m.label}
@@ -1788,7 +1790,7 @@ function UkusaApp() {
                         + EXTRA SINGLE-ORIGIN RISTRETTO SHOT
                       </span>
                       <span className="font-mono text-[11px] text-[#F4F3EF]/50">
-                        Sidama 9-Bar Pull (+$1.50)
+                        Sidama 9-Bar Pull (+₹50)
                       </span>
                     </div>
                     <input
@@ -1835,7 +1837,7 @@ function UkusaApp() {
               >
                 <span>Add to Order Bag</span>
                 <span>·</span>
-                <span>${liveCustomPrice.toFixed(2)}</span>
+                <span>{formatINR(liveCustomPrice)}</span>
               </button>
             </div>
           </div>
@@ -1925,7 +1927,7 @@ function UkusaApp() {
                             {item.name}
                           </h4>
                           <span className="font-mono text-sm font-bold text-[#D9B382]">
-                            ${(item.price * item.qty).toFixed(2)}
+                            {formatINR(item.price * item.qty)}
                           </span>
                         </div>
                         <p className="font-mono text-[11px] max-md:text-[10px] text-[#F4F3EF]/55 mt-1">
@@ -1975,7 +1977,7 @@ function UkusaApp() {
                     LIVE SUBTOTAL
                   </span>
                   <span className="font-mono text-3xl max-md:text-2xl font-extrabold text-[#F4F3EF]">
-                    ${cartSubtotal.toFixed(2)}
+                    {formatINR(cartSubtotal)}
                   </span>
                 </div>
                 <button
