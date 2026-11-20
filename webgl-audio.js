@@ -178,10 +178,12 @@ window.initUkusaWebGL = function (container) {
   );
   camera.position.z = 3.4;
 
+  const isMobile = window.innerWidth < 768;
+
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !isMobile,
       alpha: true,
       powerPreference: "high-performance"
     });
@@ -190,7 +192,7 @@ window.initUkusaWebGL = function (container) {
   }
 
   renderer.setSize(container.clientWidth, container.clientHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 2));
   container.innerHTML = "";
   container.appendChild(renderer.domElement);
 
@@ -301,7 +303,7 @@ window.initUkusaWebGL = function (container) {
   };
 
   // Main central organic liquid espresso torus-knot / metaball blob
-  const geometry = new THREE.IcosahedronGeometry(1.18, 64);
+  const geometry = new THREE.IcosahedronGeometry(isMobile ? 0.98 : 1.18, isMobile ? 28 : 64);
   const material = new THREE.ShaderMaterial({
     vertexShader,
     fragmentShader,
@@ -313,7 +315,7 @@ window.initUkusaWebGL = function (container) {
   scene.add(blobMesh);
 
   // Outer floating orbital crema ring
-  const ringGeo = new THREE.TorusGeometry(1.75, 0.012, 16, 180);
+  const ringGeo = new THREE.TorusGeometry(isMobile ? 1.45 : 1.75, 0.012, 16, isMobile ? 96 : 180);
   const ringMat = new THREE.MeshBasicMaterial({
     color: 0xc85a32,
     transparent: true,
@@ -324,7 +326,7 @@ window.initUkusaWebGL = function (container) {
   scene.add(ringMesh);
 
   // Floating crema micro-particles around the espresso core
-  const particleCount = 260;
+  const particleCount = isMobile ? 110 : 260;
   const pGeo = new THREE.BufferGeometry();
   const positions = new Float32Array(particleCount * 3);
   for (let i = 0; i < particleCount; i++) {

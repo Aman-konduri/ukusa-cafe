@@ -10,7 +10,12 @@ const { useState, useEffect, useRef, useMemo, useCallback } = React;
 function Magnetic({ children, strength = 0.28, cursorLabel = "", cursorColor = "", className = "" }) {
   const ref = useRef(null);
 
+  const isTouchOrMobile = () =>
+    window.innerWidth < 768 ||
+    (window.matchMedia && window.matchMedia("(hover: none)").matches);
+
   const handleMouseMove = (e) => {
+    if (isTouchOrMobile()) return;
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -20,6 +25,7 @@ function Magnetic({ children, strength = 0.28, cursorLabel = "", cursorColor = "
   };
 
   const handleMouseEnter = () => {
+    if (isTouchOrMobile()) return;
     if (window.ukusaSound) window.ukusaSound.playHover();
     if (cursorLabel && window.setUkusaCursor) {
       window.setUkusaCursor({ active: true, label: cursorLabel, color: cursorColor });
@@ -31,6 +37,7 @@ function Magnetic({ children, strength = 0.28, cursorLabel = "", cursorColor = "
     if (el) {
       el.style.transform = "translate3d(0px, 0px, 0px)";
     }
+    if (isTouchOrMobile()) return;
     if (cursorLabel && window.setUkusaCursor) {
       window.setUkusaCursor({ active: false, label: "", color: "" });
     }
@@ -241,7 +248,7 @@ function DraggablePhotoStack() {
 
   const handlePointerUp = () => {
     if (!dragState.dragging) return;
-    const threshold = 95;
+    const threshold = window.innerWidth < 768 ? 55 : 95;
     if (Math.hypot(dragState.x, dragState.y) > threshold) {
       // Flick card to back of deck
       if (window.ukusaSound) window.ukusaSound.playConfirm();
@@ -262,9 +269,9 @@ function DraggablePhotoStack() {
   };
 
   return (
-    <div className="relative w-full max-w-[440px] mx-auto h-[540px] select-none">
+    <div className="relative w-full max-w-[440px] mx-auto h-[540px] max-md:h-[460px] select-none">
       {/* Stack Header Indicator */}
-      <div className="flex justify-between items-center mb-4 font-mono text-xs tracking-[0.18em] text-[#0B0B0C]/60">
+      <div className="flex justify-between items-center mb-4 font-mono text-xs max-md:text-[10px] tracking-[0.18em] text-[#0B0B0C]/60">
         <span>INTERACTIVE ARCHIVE // DRAG OR FLICK</span>
         <button
           onClick={cycleNextCard}
@@ -275,7 +282,7 @@ function DraggablePhotoStack() {
       </div>
 
       <div
-        className="relative w-full h-[480px]"
+        className="relative w-full h-[480px] max-md:h-[400px]"
         onMouseEnter={() =>
           window.setUkusaCursor && window.setUkusaCursor({ active: true, label: "DRAG", color: "#C85A32" })
         }
@@ -425,15 +432,15 @@ function BrewFinderSection({ onAddPairing }) {
   };
 
   return (
-    <section id="ritual" className="relative py-28 md:py-36 px-6 md:px-14 bg-[#111113] border-y border-[#F4F3EF]/10">
+    <section id="ritual" className="relative py-28 md:py-36 max-md:py-14 px-6 md:px-14 max-md:px-5 bg-[#111113] border-y border-[#F4F3EF]/10">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 max-md:mb-8 gap-6 max-md:gap-3">
           <div>
             <p className="font-mono text-xs tracking-[0.25em] text-[#C85A32] uppercase mb-3">
               03 // ALGORITHMIC SOMMELIER
             </p>
-            <h2 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-[#F4F3EF]">
+            <h2 className="font-display text-4xl md:text-6xl max-md:text-3xl font-extrabold tracking-tight text-[#F4F3EF]">
               CALIBRATE YOUR RITUAL.
             </h2>
           </div>
@@ -443,15 +450,15 @@ function BrewFinderSection({ onAddPairing }) {
         </div>
 
         {/* Interactive Matrix Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 max-md:gap-6 items-stretch">
           {/* Left Controls (7 cols) */}
-          <div className="lg:col-span-7 bg-[#0B0B0C] border border-[#F4F3EF]/12 rounded-3xl p-8 md:p-10 flex flex-col justify-between">
+          <div className="lg:col-span-7 bg-[#0B0B0C] border border-[#F4F3EF]/12 rounded-3xl max-md:rounded-2xl p-8 md:p-10 max-md:p-5 flex flex-col justify-between">
             {/* Quick Mood Pills */}
-            <div className="mb-10">
-              <span className="block font-mono text-[11px] tracking-[0.2em] text-[#F4F3EF]/50 uppercase mb-4">
+            <div className="mb-10 max-md:mb-7">
+              <span className="block font-mono text-[11px] tracking-[0.2em] text-[#F4F3EF]/50 uppercase mb-4 max-md:mb-3">
                 QUICK SENSORY PRESETS
               </span>
-              <div className="flex flex-wrap gap-2.5">
+              <div className="flex flex-wrap gap-2.5 max-md:gap-2">
                 {[
                   { label: "KYOTO DAWN (UMAMI & HOT)", b: 45, t: "Hot", p: 85 },
                   { label: "VELVET GOLDEN HOUR (SWEET & ICED)", b: 35, t: "Iced", p: 25 },
@@ -461,7 +468,7 @@ function BrewFinderSection({ onAddPairing }) {
                   <button
                     key={idx}
                     onClick={() => applyPreset(preset.b, preset.t, preset.p)}
-                    className="font-mono text-xs px-4 py-2 rounded-full border border-[#F4F3EF]/15 text-[#F4F3EF]/80 hover:border-[#C85A32] hover:text-[#F4F3EF] hover:bg-[#C85A32]/15 transition-all"
+                    className="font-mono text-xs max-md:text-[10px] px-4 py-2 max-md:px-3 max-md:py-2 rounded-full border border-[#F4F3EF]/15 text-[#F4F3EF]/80 hover:border-[#C85A32] hover:text-[#F4F3EF] hover:bg-[#C85A32]/15 transition-all text-left"
                   >
                     {preset.label}
                   </button>
@@ -470,14 +477,15 @@ function BrewFinderSection({ onAddPairing }) {
             </div>
 
             {/* Sliders & Toggles */}
-            <div className="space-y-9">
+            <div className="space-y-9 max-md:space-y-6">
               {/* Axis 1: Bold vs Smooth */}
               <div>
-                <div className="flex justify-between font-mono text-xs tracking-[0.15em] mb-3">
+                <div className="flex justify-between font-mono text-xs max-md:text-[10px] tracking-[0.15em] max-md:tracking-[0.08em] mb-3">
                   <span className={boldness < 50 ? "text-[#D9B382] font-bold" : "text-[#F4F3EF]/50"}>
                     ← SILKY & SMOOTH
                   </span>
-                  <span className="text-[#F4F3EF]/40">EXTRACTION INTENSITY: {boldness}%</span>
+                  <span className="text-[#F4F3EF]/40 max-md:hidden">EXTRACTION INTENSITY: {boldness}%</span>
+                  <span className="text-[#F4F3EF]/40 md:hidden">{boldness}%</span>
                   <span className={boldness >= 50 ? "text-[#C85A32] font-bold" : "text-[#F4F3EF]/50"}>
                     BOLD & VISCOUS →
                   </span>
@@ -494,11 +502,11 @@ function BrewFinderSection({ onAddPairing }) {
 
               {/* Axis 2: Temperature Toggle */}
               <div>
-                <div className="flex justify-between font-mono text-xs tracking-[0.15em] mb-3">
+                <div className="flex justify-between font-mono text-xs max-md:text-[10px] tracking-[0.15em] max-md:tracking-[0.08em] mb-3">
                   <span className="text-[#F4F3EF]/50">THERMAL EXTRACTION STATE</span>
                   <span className="text-[#D9B382]">{tempPref === "Hot" ? "58°C – 93°C" : "2°C GLACIAL"}</span>
                 </div>
-                <div className="grid grid-cols-2 gap-3 p-1.5 rounded-2xl bg-[#161618] border border-[#F4F3EF]/10">
+                <div className="grid grid-cols-2 gap-3 max-md:gap-2 p-1.5 rounded-2xl bg-[#161618] border border-[#F4F3EF]/10">
                   {["Hot", "Iced"].map((temp) => (
                     <button
                       key={temp}
@@ -506,7 +514,7 @@ function BrewFinderSection({ onAddPairing }) {
                         if (window.ukusaSound) window.ukusaSound.playClick();
                         setTempPref(temp);
                       }}
-                      className={`py-3.5 rounded-xl font-mono text-xs tracking-[0.2em] uppercase transition-all ${
+                      className={`py-3.5 rounded-xl font-mono text-xs max-md:text-[11px] tracking-[0.2em] max-md:tracking-[0.1em] uppercase transition-all ${
                         tempPref === temp
                           ? "bg-[#C85A32] text-[#F4F3EF] font-bold shadow-lg"
                           : "text-[#F4F3EF]/60 hover:text-[#F4F3EF]"
@@ -520,11 +528,12 @@ function BrewFinderSection({ onAddPairing }) {
 
               {/* Axis 3: Sweet vs Earthy */}
               <div>
-                <div className="flex justify-between font-mono text-xs tracking-[0.15em] mb-3">
+                <div className="flex justify-between font-mono text-xs max-md:text-[10px] tracking-[0.15em] max-md:tracking-[0.08em] mb-3">
                   <span className={profile < 50 ? "text-[#D9B382] font-bold" : "text-[#F4F3EF]/50"}>
                     ← CARAMEL & SWEET
                   </span>
-                  <span className="text-[#F4F3EF]/40">TERROIR SPECTRUM: {profile}%</span>
+                  <span className="text-[#F4F3EF]/40 max-md:hidden">TERROIR SPECTRUM: {profile}%</span>
+                  <span className="text-[#F4F3EF]/40 md:hidden">{profile}%</span>
                   <span className={profile >= 50 ? "text-[#C85A32] font-bold" : "text-[#F4F3EF]/50"}>
                     EARTHY & UMAMI →
                   </span>
@@ -541,7 +550,7 @@ function BrewFinderSection({ onAddPairing }) {
             </div>
 
             {/* Bottom Live Telemetry Bar */}
-            <div className="mt-10 pt-6 border-t border-[#F4F3EF]/10 flex flex-wrap justify-between items-center gap-4 font-mono text-[11px] text-[#F4F3EF]/50">
+            <div className="mt-10 max-md:mt-6 pt-6 max-md:pt-4 border-t border-[#F4F3EF]/10 flex flex-wrap justify-between items-center gap-4 max-md:gap-2 font-mono text-[11px] max-md:text-[10px] text-[#F4F3EF]/50">
               <span>TDS TARGET: {(1.35 + boldness * 0.008).toFixed(2)}%</span>
               <span>WATER MINERALITY: 65 PPM</span>
               <span className="text-[#D9B382]">PAIRING SYNERGY: 99.4%</span>
@@ -549,9 +558,9 @@ function BrewFinderSection({ onAddPairing }) {
           </div>
 
           {/* Right Live Recommendation Output Card (5 cols) */}
-          <div className="lg:col-span-5 bg-[#F4F3EF] text-[#0B0B0C] rounded-3xl p-8 md:p-10 flex flex-col justify-between relative overflow-hidden shadow-2xl">
+          <div className="lg:col-span-5 bg-[#F4F3EF] text-[#0B0B0C] rounded-3xl max-md:rounded-2xl p-8 md:p-10 max-md:p-5 flex flex-col justify-between relative overflow-hidden shadow-2xl">
             <div>
-              <div className="flex justify-between items-center font-mono text-xs tracking-[0.18em] mb-6">
+              <div className="flex justify-between items-center font-mono text-xs max-md:text-[10px] tracking-[0.18em] mb-6 max-md:mb-4">
                 <span className="px-3 py-1 rounded-full bg-[#0B0B0C] text-[#F4F3EF]">
                   BESPOKE PAIRING
                 </span>
@@ -559,8 +568,8 @@ function BrewFinderSection({ onAddPairing }) {
               </div>
 
               {/* Dual visual thumbnails */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="group relative rounded-2xl overflow-hidden h-40 bg-[#0B0B0C]">
+              <div className="grid grid-cols-2 gap-4 max-md:gap-3 mb-6 max-md:mb-5">
+                <div className="group relative rounded-2xl overflow-hidden h-40 max-md:h-32 bg-[#0B0B0C]">
                   <img
                     src={recommendation.drink.image}
                     alt={recommendation.drink.name}
@@ -570,7 +579,7 @@ function BrewFinderSection({ onAddPairing }) {
                     01 // CUP
                   </span>
                 </div>
-                <div className="group relative rounded-2xl overflow-hidden h-40 bg-[#0B0B0C]">
+                <div className="group relative rounded-2xl overflow-hidden h-40 max-md:h-32 bg-[#0B0B0C]">
                   <img
                     src={recommendation.pastry.image}
                     alt={recommendation.pastry.name}
@@ -582,12 +591,12 @@ function BrewFinderSection({ onAddPairing }) {
                 </div>
               </div>
 
-              <div className="space-y-3 mb-6">
+              <div className="space-y-3 mb-6 max-md:mb-5">
                 <div>
                   <span className="font-mono text-[10px] tracking-[0.2em] text-[#C85A32] uppercase">
                     LIQUID COMPONENT ({tempPref.toUpperCase()})
                   </span>
-                  <h3 className="font-display text-2xl font-extrabold leading-tight">
+                  <h3 className="font-display text-2xl max-md:text-xl font-extrabold leading-tight">
                     {recommendation.drink.name}
                   </h3>
                 </div>
@@ -596,19 +605,19 @@ function BrewFinderSection({ onAddPairing }) {
                   <span className="font-mono text-[10px] tracking-[0.2em] text-[#C85A32] uppercase">
                     PASTRY COMPONENT
                   </span>
-                  <h4 className="font-display text-xl font-bold leading-tight">
+                  <h4 className="font-display text-xl max-md:text-lg font-bold leading-tight">
                     {recommendation.pastry.name}
                   </h4>
                 </div>
               </div>
 
-              <p className="text-xs text-[#0B0B0C]/75 leading-relaxed border-l-2 border-[#C85A32] pl-3.5 mb-8">
+              <p className="text-xs text-[#0B0B0C]/75 leading-relaxed border-l-2 border-[#C85A32] pl-3.5 mb-8 max-md:mb-5">
                 {recommendation.rationale}
               </p>
             </div>
 
-            <div className="pt-5 border-t border-[#0B0B0C]/15 flex items-center justify-between gap-4">
-              <div>
+            <div className="pt-5 border-t border-[#0B0B0C]/15 flex max-md:flex-col items-center max-md:items-stretch justify-between gap-4">
+              <div className="max-md:flex max-md:items-baseline max-md:justify-between">
                 <span className="block font-mono text-[10px] tracking-[0.18em] text-[#0B0B0C]/50 uppercase">
                   RITUAL PAIRING TOTAL
                 </span>
@@ -617,10 +626,10 @@ function BrewFinderSection({ onAddPairing }) {
                 </span>
               </div>
 
-              <Magnetic strength={0.2} cursorLabel="ADD +" cursorColor="#C85A32">
+              <Magnetic strength={0.2} cursorLabel="ADD +" cursorColor="#C85A32" className="max-md:w-full">
                 <button
                   onClick={() => onAddPairing(recommendation.drink, recommendation.pastry, tempPref)}
-                  className="px-6 py-4 rounded-full bg-[#0B0B0C] text-[#F4F3EF] hover:bg-[#C85A32] transition-colors font-mono text-xs tracking-[0.18em] uppercase font-bold"
+                  className="px-6 py-4 max-md:w-full rounded-full bg-[#0B0B0C] text-[#F4F3EF] hover:bg-[#C85A32] transition-colors font-mono text-xs tracking-[0.18em] uppercase font-bold"
                 >
                   Add Pairing to Order +
                 </button>
@@ -692,9 +701,9 @@ function PhysicsWordmark() {
       onMouseLeave={() =>
         window.setUkusaCursor && window.setUkusaCursor({ active: false, label: "", color: "" })
       }
-      className="w-full overflow-hidden py-8 select-none cursor-none"
+      className="w-full overflow-hidden py-8 max-md:py-4 select-none md:cursor-none"
     >
-      <div className="flex justify-between items-center px-2 md:px-6">
+      <div className="flex justify-between items-center px-2 md:px-6 max-md:px-1 w-full">
         {letters.map((char, i) => (
           <span
             key={i}
@@ -703,7 +712,7 @@ function PhysicsWordmark() {
               transition: "transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s ease",
               willChange: "transform"
             }}
-            className="font-display font-extrabold text-[19vw] leading-[0.82] tracking-tighter text-[#F4F3EF] inline-block"
+            className="font-display font-extrabold text-[19vw] max-md:text-[17vw] leading-[0.82] tracking-tighter text-[#F4F3EF] inline-block"
           >
             {char}
           </span>
@@ -719,6 +728,7 @@ function PhysicsWordmark() {
 function UkusaApp() {
   const [loaded, setLoaded] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("espresso");
 
   // Floating menu hover image preview state
@@ -829,22 +839,25 @@ function UkusaApp() {
         );
       }
 
-      // 2. Horizontal Scroll Gallery ("The Space")
-      if (horizontalSectionRef.current && horizontalTrackRef.current) {
-        const track = horizontalTrackRef.current;
-        gsap.to(track, {
-          x: () => -(track.scrollWidth - window.innerWidth + 96),
-          ease: "none",
-          scrollTrigger: {
-            trigger: horizontalSectionRef.current,
-            start: "top top",
-            end: () => `+=${track.scrollWidth - window.innerWidth + 200}`,
-            pin: true,
-            scrub: 1,
-            invalidateOnRefresh: true
-          }
-        });
-      }
+      // 2. Horizontal Scroll Gallery ("The Space") — Desktop (>= 768px) only; Mobile uses native snap-x carousel
+      const mm = gsap.matchMedia();
+      mm.add("(min-width: 768px)", () => {
+        if (horizontalSectionRef.current && horizontalTrackRef.current) {
+          const track = horizontalTrackRef.current;
+          gsap.to(track, {
+            x: () => -(track.scrollWidth - window.innerWidth + 96),
+            ease: "none",
+            scrollTrigger: {
+              trigger: horizontalSectionRef.current,
+              start: "top top",
+              end: () => `+=${track.scrollWidth - window.innerWidth + 200}`,
+              pin: true,
+              scrub: 1,
+              invalidateOnRefresh: true
+            }
+          });
+        }
+      });
     }
 
     return () => {
@@ -988,7 +1001,7 @@ function UkusaApp() {
     "WE APPROACH COFFEE NOT AS COMMODITY, BUT AS LIQUID ARCHITECTURE. FROM HIGH-ALTITUDE VOLCANIC LOTS IN SIDAMA AND BOQUETE TO OUR CAST-IRON 1968 PROBAT ROASTER, EVERY EXTRACTION IS CALIBRATED FOR VISCOSITY, CLARITY, AND QUIET SENSORY RESONANCE.";
 
   return (
-    <div className="min-h-screen bg-[#0B0B0C] text-[#F4F3EF] selection:bg-[#C85A32] selection:text-[#F4F3EF] relative">
+    <div className="min-h-screen bg-[#0B0B0C] text-[#F4F3EF] selection:bg-[#C85A32] selection:text-[#F4F3EF] relative max-md:overflow-x-hidden">
       {/* Custom Morphing Cursor */}
       <CustomCursor />
 
@@ -997,19 +1010,20 @@ function UkusaApp() {
 
       {/* Toast Notification Pill */}
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[4000] px-6 py-3 rounded-full bg-[#C85A32] text-[#F4F3EF] font-mono text-xs tracking-[0.2em] shadow-2xl flex items-center gap-3 animate-bounce">
-          <span className="w-2 h-2 rounded-full bg-[#F4F3EF]" />
-          <span>{toast}</span>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[4000] px-6 py-3 max-md:px-4 max-md:py-2.5 max-md:w-[90vw] max-md:justify-center rounded-full bg-[#C85A32] text-[#F4F3EF] font-mono text-xs max-md:text-[10px] tracking-[0.2em] shadow-2xl flex items-center gap-3 animate-bounce">
+          <span className="w-2 h-2 rounded-full bg-[#F4F3EF] flex-shrink-0" />
+          <span className="truncate">{toast}</span>
         </div>
       )}
 
       {/* ==================================================================
           STICKY MINIMALIST EDITORIAL HEADER
          ================================================================== */}
-      <header className="fixed top-0 left-0 right-0 z-[1000] px-6 md:px-12 py-5 flex items-center justify-between backdrop-blur-md bg-[#0B0B0C]/70 border-b border-[#F4F3EF]/10">
+      <header className="fixed top-0 left-0 right-0 z-[1000] px-6 md:px-12 max-md:px-5 py-5 max-md:py-3.5 flex items-center justify-between backdrop-blur-md bg-[#0B0B0C]/70 border-b border-[#F4F3EF]/10">
         <Magnetic strength={0.22}>
           <a
             href="#hero"
+            onClick={() => setMobileMenuOpen(false)}
             className="flex items-center gap-3 group"
           >
             <span className="w-2.5 h-2.5 rounded-full bg-[#C85A32] group-hover:scale-125 transition-transform" />
@@ -1041,8 +1055,8 @@ function UkusaApp() {
           ))}
         </nav>
 
-        {/* Right Controls: Ambient Sound Toggle + Reserve + Live Order Bag */}
-        <div className="flex items-center gap-3">
+        {/* Right Controls: Ambient Sound Toggle + Reserve + Live Order Bag + Mobile Menu Toggle */}
+        <div className="flex items-center gap-3 max-md:gap-2">
           {/* Ambient Sound Button */}
           <Magnetic strength={0.25} cursorLabel={soundOn ? "MUTE" : "AUDIO"}>
             <button
@@ -1051,7 +1065,7 @@ function UkusaApp() {
                 setSoundOn(state);
               }}
               aria-label="Toggle Ambient Sound"
-              className={`px-3.5 py-2 rounded-full border font-mono text-[11px] tracking-[0.15em] flex items-center gap-2 transition-all ${
+              className={`px-3.5 py-2 max-md:px-2.5 max-md:py-2 rounded-full border font-mono text-[11px] tracking-[0.15em] flex items-center gap-2 transition-all ${
                 soundOn
                   ? "border-[#C85A32] bg-[#C85A32]/20 text-[#F4F3EF]"
                   : "border-[#F4F3EF]/20 text-[#F4F3EF]/60 hover:text-[#F4F3EF]"
@@ -1093,9 +1107,10 @@ function UkusaApp() {
             <button
               onClick={() => {
                 if (window.ukusaSound) window.ukusaSound.playClick();
+                setMobileMenuOpen(false);
                 setCartOpen(true);
               }}
-              className="px-4 py-2 rounded-full bg-[#F4F3EF] text-[#0B0B0C] hover:bg-[#C85A32] hover:text-[#F4F3EF] font-mono text-[11px] font-bold tracking-[0.18em] uppercase transition-colors flex items-center gap-2"
+              className="px-4 py-2 max-md:px-3.5 max-md:py-2 rounded-full bg-[#F4F3EF] text-[#0B0B0C] hover:bg-[#C85A32] hover:text-[#F4F3EF] font-mono text-[11px] font-bold tracking-[0.18em] uppercase transition-colors flex items-center gap-2"
             >
               <span>ORDER</span>
               <span className="px-1.5 py-0.5 rounded-full bg-[#0B0B0C] text-[#F4F3EF] text-[10px]">
@@ -1103,15 +1118,91 @@ function UkusaApp() {
               </span>
             </button>
           </Magnetic>
+
+          {/* Dedicated Mobile Hamburger Menu Button (< 768px only) */}
+          <button
+            onClick={() => {
+              if (window.ukusaSound) window.ukusaSound.playClick();
+              setMobileMenuOpen((prev) => !prev);
+            }}
+            aria-label="Toggle Mobile Navigation"
+            className="md:hidden w-9 h-9 rounded-full border border-[#F4F3EF]/25 flex flex-col items-center justify-center gap-1.5 text-[#F4F3EF] active:bg-[#C85A32] transition-colors"
+          >
+            <span
+              className={`w-4 h-[1.5px] bg-current transition-transform duration-300 ${
+                mobileMenuOpen ? "rotate-45 translate-y-[3.5px]" : ""
+              }`}
+            />
+            <span
+              className={`w-4 h-[1.5px] bg-current transition-transform duration-300 ${
+                mobileMenuOpen ? "-rotate-45 -translate-y-[3.5px]" : ""
+              }`}
+            />
+          </button>
         </div>
       </header>
+
+      {/* ==================================================================
+          DEDICATED MOBILE FULL-SCREEN NAVIGATION OVERLAY (< 768px only)
+         ================================================================== */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-[950] bg-[#0B0B0C]/98 backdrop-blur-xl pt-24 pb-8 px-6 flex flex-col justify-between overflow-y-auto">
+          <div className="space-y-2">
+            <span className="font-mono text-[10px] tracking-[0.25em] text-[#C85A32] uppercase block mb-4">
+              SANCTUARY DIRECTORY
+            </span>
+            {[
+              { href: "#philosophy", code: "01", label: "Philosophy & Terroir" },
+              { href: "#menu", code: "02", label: "Seasonal Menu" },
+              { href: "#ritual", code: "03", label: "Find Your Brew" },
+              { href: "#space", code: "04", label: "The Sanctuary" }
+            ].map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={() => {
+                  if (window.ukusaSound) window.ukusaSound.playClick();
+                  setMobileMenuOpen(false);
+                }}
+                className="flex items-baseline justify-between py-4 border-b border-[#F4F3EF]/12 active:text-[#C85A32]"
+              >
+                <div className="flex items-baseline gap-3">
+                  <span className="font-mono text-xs text-[#C85A32]">{item.code}</span>
+                  <span className="font-display text-2xl font-extrabold text-[#F4F3EF]">
+                    {item.label}
+                  </span>
+                </div>
+                <span className="font-mono text-sm text-[#D9B382]">→</span>
+              </a>
+            ))}
+          </div>
+
+          <div className="space-y-4 pt-6">
+            <button
+              onClick={() => {
+                if (window.ukusaSound) window.ukusaSound.playClick();
+                setMobileMenuOpen(false);
+                setReservationConfirmed(false);
+                setReserveOpen(true);
+              }}
+              className="w-full py-4 rounded-full bg-[#C85A32] text-[#F4F3EF] font-mono text-xs font-bold tracking-[0.2em] uppercase"
+            >
+              Reserve a Table →
+            </button>
+            <div className="flex justify-between items-center font-mono text-[10px] tracking-[0.18em] text-[#F4F3EF]/50 pt-2">
+              <span>428 NAKAGYO-KU BASALT LANE</span>
+              <span>07:00 — 19:00</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ==================================================================
           SECTION 1: HERO WITH INTERACTIVE WEBGL ESPRESSO SHADER PLAYGROUND
          ================================================================== */}
       <section
         id="hero"
-        className="relative min-h-screen w-full flex flex-col justify-between pt-28 pb-10 px-6 md:px-14 overflow-hidden"
+        className="relative min-h-screen w-full flex flex-col justify-between pt-28 max-md:pt-20 pb-10 max-md:pb-8 px-6 md:px-14 max-md:px-5 overflow-hidden"
       >
         {/* Interactive Three.js WebGL Liquid Shader Canvas */}
         <div
@@ -1131,21 +1222,22 @@ function UkusaApp() {
         <div className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,transparent_25%,#0B0B0C_92%)]" />
 
         {/* Top Telemetry Bar */}
-        <div className="relative z-10 flex flex-wrap justify-between items-center gap-4 font-mono text-[11px] tracking-[0.22em] text-[#F4F3EF]/60 border-b border-[#F4F3EF]/10 pb-4">
+        <div className="relative z-10 flex flex-wrap justify-between items-center gap-4 max-md:gap-2 font-mono text-[11px] max-md:text-[10px] tracking-[0.22em] max-md:tracking-[0.15em] text-[#F4F3EF]/60 border-b border-[#F4F3EF]/10 pb-4 max-md:pb-3">
           <span>EXTRACTION LAB // 93.5°C · 9.0 BAR</span>
-          <span className="text-[#D9B382]">INTERACTIVE WEBGL // MOVE & CLICK TO RIPPLE CREMA</span>
-          <span>HARVEST 2026 // MICRO-LOT 04</span>
+          <span className="text-[#D9B382] max-md:hidden">INTERACTIVE WEBGL // MOVE & CLICK TO RIPPLE CREMA</span>
+          <span className="text-[#D9B382] md:hidden">TAP TO RIPPLE CREMA</span>
+          <span className="max-md:hidden">HARVEST 2026 // MICRO-LOT 04</span>
         </div>
 
         {/* Center Giant Split-Line Kinetic Typography */}
-        <div className="relative z-10 my-auto py-12 pointer-events-none">
+        <div className="relative z-10 my-auto py-12 max-md:py-6 pointer-events-none">
           <div className="overflow-hidden">
-            <p className="font-mono text-xs md:text-sm tracking-[0.3em] text-[#C85A32] uppercase mb-4">
+            <p className="font-mono text-xs md:text-sm max-md:text-[10px] tracking-[0.3em] max-md:tracking-[0.18em] text-[#C85A32] uppercase mb-4 max-md:mb-3">
               SPECIALTY COFFEE · CEREMONIAL MATCHA · LAMINATED PASTRY
             </p>
           </div>
 
-          <h1 className="font-display font-extrabold uppercase tracking-tighter leading-[0.88] text-[11.5vw] md:text-[8.8vw] text-[#F4F3EF] mix-blend-lighten">
+          <h1 className="font-display font-extrabold uppercase tracking-tighter leading-[0.88] max-md:leading-[1.05] text-[11.5vw] md:text-[8.8vw] max-md:text-[2.45rem] text-[#F4F3EF] mix-blend-lighten">
             <span className="block">UKUSA —</span>
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#F4F3EF] via-[#D9B382] to-[#C85A32]">
               CRAFTED FOR
@@ -1157,28 +1249,28 @@ function UkusaApp() {
         </div>
 
         {/* Bottom Hero Action Row */}
-        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-8 pt-6 border-t border-[#F4F3EF]/10">
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-8 max-md:gap-5 pt-6 max-md:pt-4 border-t border-[#F4F3EF]/10">
           <div className="max-w-md">
-            <p className="font-mono text-xs text-[#F4F3EF]/70 leading-relaxed">
+            <p className="font-mono text-xs max-md:text-[11px] text-[#F4F3EF]/70 leading-relaxed">
               AN ARCHITECTURAL ESPRESSO SANCTUARY INSPIRED BY KYOTO LISTEN-BARS AND NORDIC ROASTING PRECISION.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4">
-            <Magnetic strength={0.25} cursorLabel="EXPLORE" cursorColor="#C85A32">
+          <div className="flex flex-wrap items-center gap-4 max-md:gap-3 max-md:w-full">
+            <Magnetic strength={0.25} cursorLabel="EXPLORE" cursorColor="#C85A32" className="max-md:w-full">
               <a
                 href="#menu"
-                className="px-8 py-4 rounded-full bg-[#C85A32] text-[#F4F3EF] hover:bg-[#F4F3EF] hover:text-[#0B0B0C] font-mono text-xs font-bold tracking-[0.2em] uppercase transition-all shadow-xl inline-flex items-center gap-3"
+                className="px-8 py-4 max-md:w-full max-md:justify-center rounded-full bg-[#C85A32] text-[#F4F3EF] hover:bg-[#F4F3EF] hover:text-[#0B0B0C] font-mono text-xs font-bold tracking-[0.2em] uppercase transition-all shadow-xl inline-flex items-center gap-3"
               >
                 <span>Explore Seasonal Menu</span>
                 <span>↘</span>
               </a>
             </Magnetic>
 
-            <Magnetic strength={0.25} cursorLabel="TASTE" cursorColor="#D9B382">
+            <Magnetic strength={0.25} cursorLabel="TASTE" cursorColor="#D9B382" className="max-md:w-full">
               <a
                 href="#ritual"
-                className="px-7 py-4 rounded-full border border-[#F4F3EF]/25 hover:border-[#D9B382] text-[#F4F3EF] font-mono text-xs tracking-[0.2em] uppercase transition-all"
+                className="px-7 py-4 max-md:w-full max-md:text-center max-md:block rounded-full border border-[#F4F3EF]/25 hover:border-[#D9B382] text-[#F4F3EF] font-mono text-xs tracking-[0.2em] uppercase transition-all"
               >
                 Find Your Brew
               </a>
@@ -1192,19 +1284,19 @@ function UkusaApp() {
          ================================================================== */}
       <section
         id="philosophy"
-        className="relative py-28 md:py-40 px-6 md:px-14 bg-[#F4F3EF] text-[#0B0B0C] rounded-t-[2.5rem] md:rounded-t-[4rem]"
+        className="relative py-28 md:py-40 max-md:py-14 px-6 md:px-14 max-md:px-5 bg-[#F4F3EF] text-[#0B0B0C] rounded-t-[2.5rem] md:rounded-t-[4rem] max-md:rounded-t-[1.75rem]"
       >
         <div className="max-w-7xl mx-auto">
           {/* Top Section Meta */}
-          <div className="flex flex-wrap justify-between items-center gap-4 pb-8 mb-16 border-b border-[#0B0B0C]/15 font-mono text-xs tracking-[0.2em]">
+          <div className="flex flex-wrap justify-between items-center gap-4 max-md:gap-2 pb-8 max-md:pb-5 mb-16 max-md:mb-8 border-b border-[#0B0B0C]/15 font-mono text-xs max-md:text-[10px] tracking-[0.2em] max-md:tracking-[0.14em]">
             <span className="text-[#C85A32] font-bold">01 // PHILOSOPHY & TERROIR</span>
             <span>PROBAT UG22 · REMINERALIZED WATER · 72H FERMENTATION</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-14 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-14 max-md:gap-10 items-center">
             {/* Left 7 Cols: Scroll-Scrubbed Word-by-Word Illuminated Editorial Text */}
-            <div ref={storyContainerRef} className="lg:col-span-7 space-y-10">
-              <div className="font-display font-bold text-2xl sm:text-4xl md:text-[42px] leading-[1.18] tracking-tight">
+            <div ref={storyContainerRef} className="lg:col-span-7 space-y-10 max-md:space-y-6">
+              <div className="font-display font-bold text-2xl sm:text-4xl md:text-[42px] max-md:text-xl leading-[1.18] max-md:leading-[1.35] tracking-tight">
                 {storyText.split(" ").map((word, idx) => (
                   <span
                     key={idx}
@@ -1216,7 +1308,7 @@ function UkusaApp() {
               </div>
 
               {/* 3 Architectural Pillars */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-[#0B0B0C]/15">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-md:gap-5 pt-8 max-md:pt-6 border-t border-[#0B0B0C]/15">
                 <div>
                   <span className="font-mono text-xs text-[#C85A32] font-bold tracking-[0.2em]">
                     01 / SOURCE
@@ -1264,7 +1356,7 @@ function UkusaApp() {
       {/* ==================================================================
           SECTION 3: INTERACTIVE MENU & FLOATING CURSOR-TRAILING PREVIEW
          ================================================================== */}
-      <section id="menu" className="relative py-28 md:py-36 px-6 md:px-14 bg-[#0B0B0C] text-[#F4F3EF]">
+      <section id="menu" className="relative py-28 md:py-36 max-md:py-14 px-6 md:px-14 max-md:px-5 bg-[#0B0B0C] text-[#F4F3EF]">
         {/* Floating Cursor-Trailing Image Preview */}
         <div
           ref={previewRef}
@@ -1293,32 +1385,33 @@ function UkusaApp() {
 
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 max-md:mb-7 gap-6 max-md:gap-3">
             <div>
               <p className="font-mono text-xs tracking-[0.25em] text-[#C85A32] uppercase mb-3">
                 02 // SEASONAL CURATION
               </p>
-              <h2 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight">
+              <h2 className="font-display text-4xl md:text-6xl max-md:text-3xl font-extrabold tracking-tight">
                 THE EXTRACTION MENU.
               </h2>
             </div>
             <p className="font-mono text-xs text-[#F4F3EF]/60 max-w-sm">
-              HOVER ANY ITEM TO PREVIEW. CLICK TO OPEN THE BESPOKE CUSTOMIZER & LIVE ORDER BAG.
+              <span className="max-md:hidden">HOVER ANY ITEM TO PREVIEW. CLICK TO OPEN THE BESPOKE CUSTOMIZER & LIVE ORDER BAG.</span>
+              <span className="md:hidden">TAP ANY ITEM TO OPEN THE BESPOKE CUSTOMIZER & LIVE ORDER BAG.</span>
             </p>
           </div>
 
-          {/* Animated Category Filter Tabs */}
-          <div className="flex flex-wrap gap-3 pb-10 mb-10 border-b border-[#F4F3EF]/12">
+          {/* Animated Category Filter Tabs (Horizontally scrollable pills on mobile) */}
+          <div className="flex flex-wrap max-md:flex-nowrap max-md:overflow-x-auto no-scrollbar gap-3 max-md:gap-2.5 pb-10 max-md:pb-6 mb-10 max-md:mb-6 border-b border-[#F4F3EF]/12 max-md:-mx-5 max-md:px-5">
             {window.UKUSA_DATA.categories.map((cat) => {
               const isActive = activeCategory === cat.id;
               return (
-                <Magnetic key={cat.id} strength={0.18}>
+                <Magnetic key={cat.id} strength={0.18} className="max-md:flex-shrink-0">
                   <button
                     onClick={() => {
                       if (window.ukusaSound) window.ukusaSound.playClick();
                       setActiveCategory(cat.id);
                     }}
-                    className={`px-6 py-3.5 rounded-full font-mono text-xs tracking-[0.18em] uppercase transition-all flex items-center gap-3 ${
+                    className={`px-6 py-3.5 max-md:px-4 max-md:py-2.5 rounded-full font-mono text-xs max-md:text-[11px] tracking-[0.18em] uppercase transition-all flex items-center gap-3 max-md:gap-2 whitespace-nowrap ${
                       isActive
                         ? "bg-[#F4F3EF] text-[#0B0B0C] font-bold shadow-lg"
                         : "bg-[#151518] text-[#F4F3EF]/70 hover:text-[#F4F3EF] border border-[#F4F3EF]/10"
@@ -1357,50 +1450,59 @@ function UkusaApp() {
                   }
                 }}
                 onClick={() => openCustomizer(item)}
-                className="group py-8 px-4 -mx-4 rounded-2xl hover:bg-[#F4F3EF]/[0.04] transition-all cursor-pointer flex flex-col lg:flex-row lg:items-center justify-between gap-6"
+                className="group py-8 max-md:py-5 px-4 max-md:px-2 -mx-4 max-md:-mx-2 rounded-2xl hover:bg-[#F4F3EF]/[0.04] transition-all cursor-pointer flex flex-col lg:flex-row lg:items-center justify-between gap-6 max-md:gap-4"
               >
-                {/* Left Code & Title */}
-                <div className="flex items-start md:items-center gap-6">
-                  <span className="font-mono text-xs text-[#C85A32] tracking-[0.2em] pt-1 md:pt-0">
+                {/* Left Code, Mobile Thumbnail & Title */}
+                <div className="flex items-start md:items-center gap-6 max-md:gap-3.5">
+                  {/* Crisp Mobile Thumbnail (< 768px only) since mobile users don't hover */}
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="md:hidden w-16 h-16 rounded-xl object-cover flex-shrink-0 border border-[#F4F3EF]/15 bg-[#151518]"
+                  />
+                  <span className="max-md:hidden font-mono text-xs text-[#C85A32] tracking-[0.2em] pt-1 md:pt-0">
                     {item.code}
                   </span>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-3 mb-1.5">
-                      <h3 className="font-display text-2xl md:text-3xl font-bold group-hover:text-[#D9B382] transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <span className="md:hidden block font-mono text-[10px] text-[#C85A32] tracking-[0.18em] mb-0.5">
+                      {item.code}
+                    </span>
+                    <div className="flex flex-wrap items-center gap-3 max-md:gap-1.5 mb-1.5">
+                      <h3 className="font-display text-2xl md:text-3xl max-md:text-lg font-bold group-hover:text-[#D9B382] transition-colors leading-snug">
                         {item.name}
                       </h3>
                       {item.tags &&
                         item.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="font-mono text-[10px] tracking-[0.18em] px-2.5 py-0.5 rounded-full border border-[#F4F3EF]/20 text-[#F4F3EF]/70"
+                            className="font-mono text-[10px] max-md:text-[9px] tracking-[0.18em] max-md:tracking-[0.12em] px-2.5 py-0.5 max-md:px-2 rounded-full border border-[#F4F3EF]/20 text-[#F4F3EF]/70"
                           >
                             {tag}
                           </span>
                         ))}
                     </div>
-                    <p className="text-sm text-[#F4F3EF]/60 max-w-2xl leading-relaxed">
+                    <p className="text-sm max-md:text-xs text-[#F4F3EF]/60 max-w-2xl leading-relaxed">
                       {item.description}
                     </p>
                   </div>
                 </div>
 
                 {/* Right Tasting Notes + Price + Quick Customize CTA */}
-                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between lg:justify-end gap-6 lg:gap-10 pl-14 lg:pl-0">
-                  <div className="text-left lg:text-right">
-                    <span className="block font-mono text-[10px] tracking-[0.2em] text-[#D9B382] uppercase">
+                <div className="flex flex-wrap sm:flex-nowrap items-center justify-between lg:justify-end gap-6 max-md:gap-3 lg:gap-10 pl-14 max-md:pl-0 lg:pl-0 max-md:pt-2 max-md:border-t max-md:border-[#F4F3EF]/10">
+                  <div className="text-left lg:text-right max-md:flex-1 max-md:min-w-0">
+                    <span className="block font-mono text-[10px] tracking-[0.2em] max-md:tracking-[0.12em] text-[#D9B382] uppercase truncate">
                       {item.tastingNotes}
                     </span>
-                    <span className="block font-mono text-[11px] text-[#F4F3EF]/45 mt-0.5">
+                    <span className="block font-mono text-[11px] max-md:text-[10px] text-[#F4F3EF]/45 mt-0.5 truncate">
                       {item.origin}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    <span className="font-mono text-2xl font-bold text-[#F4F3EF]">
+                  <div className="flex items-center gap-4 max-md:gap-3 flex-shrink-0">
+                    <span className="font-mono text-2xl max-md:text-lg font-bold text-[#F4F3EF]">
                       ${item.price.toFixed(2)}
                     </span>
-                    <span className="w-11 h-11 rounded-full border border-[#F4F3EF]/20 group-hover:bg-[#C85A32] group-hover:border-[#C85A32] flex items-center justify-center font-mono text-lg transition-all">
+                    <span className="w-11 h-11 max-md:w-9 max-md:h-9 rounded-full border border-[#F4F3EF]/20 group-hover:bg-[#C85A32] group-hover:border-[#C85A32] flex items-center justify-center font-mono text-lg transition-all">
                       +
                     </span>
                   </div>
@@ -1417,31 +1519,33 @@ function UkusaApp() {
       <BrewFinderSection onAddPairing={handleAddPairingToCart} />
 
       {/* ==================================================================
-          SECTION 5: THE SPACE (SCROLL-LOCKED HORIZONTAL GALLERY)
+          SECTION 5: THE SPACE (SCROLL-LOCKED HORIZONTAL GALLERY ON DESKTOP,
+          TOUCH-SWIPEABLE CAROUSEL ON MOBILE)
          ================================================================== */}
       <section
         id="space"
         ref={horizontalSectionRef}
-        className="relative h-screen w-full overflow-hidden bg-[#0B0B0C] flex flex-col justify-between py-20"
+        className="relative h-screen max-md:h-auto w-full overflow-hidden bg-[#0B0B0C] flex flex-col justify-between py-20 max-md:py-14 max-md:gap-6"
       >
-        <div className="px-6 md:px-14 flex flex-wrap justify-between items-end gap-4">
+        <div className="px-6 md:px-14 max-md:px-5 flex flex-wrap justify-between items-end gap-4 max-md:gap-2">
           <div>
             <p className="font-mono text-xs tracking-[0.25em] text-[#C85A32] uppercase mb-2">
               04 // SPATIAL ARCHITECTURE
             </p>
-            <h2 className="font-display text-3xl md:text-5xl font-extrabold tracking-tight">
+            <h2 className="font-display text-3xl md:text-5xl max-md:text-2xl font-extrabold tracking-tight">
               THE SANCTUARY IN MOTION.
             </h2>
           </div>
-          <span className="font-mono text-xs tracking-[0.2em] text-[#D9B382]">
-            SCROLL TO TRAVERSE GALLERY →
+          <span className="font-mono text-xs max-md:text-[10px] tracking-[0.2em] text-[#D9B382]">
+            <span className="max-md:hidden">SCROLL TO TRAVERSE GALLERY →</span>
+            <span className="md:hidden">SWIPE TO EXPLORE GALLERY →</span>
           </span>
         </div>
 
         {/* Horizontal Track */}
         <div
           ref={horizontalTrackRef}
-          className="flex items-center gap-8 md:gap-12 px-6 md:px-14 w-max"
+          className="flex items-center gap-8 md:gap-12 max-md:gap-4 px-6 md:px-14 max-md:px-5 w-max max-md:w-full max-md:overflow-x-auto max-md:snap-x max-md:snap-mandatory no-scrollbar max-md:pb-2"
         >
           {window.UKUSA_DATA.spaceGallery.map((zone) => (
             <div
@@ -1454,7 +1558,7 @@ function UkusaApp() {
                 window.setUkusaCursor &&
                 window.setUkusaCursor({ active: false, label: "", color: "" })
               }
-              className="group relative w-[84vw] sm:w-[540px] md:w-[640px] h-[56vh] min-h-[370px] max-h-[520px] rounded-3xl overflow-hidden bg-[#151517] border border-[#F4F3EF]/15 flex-shrink-0 transition-transform duration-500 hover:-translate-y-2"
+              className="group relative w-[84vw] sm:w-[540px] md:w-[640px] max-md:w-[86vw] h-[56vh] min-h-[370px] max-h-[520px] max-md:h-[380px] max-md:min-h-[340px] rounded-3xl max-md:rounded-2xl overflow-hidden bg-[#151517] border border-[#F4F3EF]/15 flex-shrink-0 max-md:snap-center transition-transform duration-500 hover:-translate-y-2"
             >
               <img
                 src={zone.image}
@@ -1463,17 +1567,17 @@ function UkusaApp() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0C] via-[#0B0B0C]/30 to-transparent" />
 
-              <div className="absolute top-6 left-6 right-6 flex justify-between items-center font-mono text-xs">
-                <span className="px-3 py-1 rounded-full bg-[#0B0B0C]/80 backdrop-blur-md text-[#D9B382] border border-[#D9B382]/30">
+              <div className="absolute top-6 left-6 right-6 max-md:top-4 max-md:left-4 max-md:right-4 flex flex-wrap justify-between items-center gap-2 font-mono text-xs max-md:text-[10px]">
+                <span className="px-3 py-1 max-md:px-2.5 max-md:py-0.5 rounded-full bg-[#0B0B0C]/80 backdrop-blur-md text-[#D9B382] border border-[#D9B382]/30">
                   {zone.code}
                 </span>
-                <span className="px-3 py-1 rounded-full bg-[#0B0B0C]/75 text-[#F4F3EF]/70">
+                <span className="px-3 py-1 max-md:px-2.5 max-md:py-0.5 rounded-full bg-[#0B0B0C]/75 text-[#F4F3EF]/70">
                   {zone.specs}
                 </span>
               </div>
 
-              <div className="absolute bottom-6 left-6 right-6">
-                <h3 className="font-display text-2xl md:text-3xl font-extrabold text-[#F4F3EF] mb-2">
+              <div className="absolute bottom-6 left-6 right-6 max-md:bottom-4 max-md:left-4 max-md:right-4">
+                <h3 className="font-display text-2xl md:text-3xl max-md:text-xl font-extrabold text-[#F4F3EF] mb-2 max-md:mb-1.5">
                   {zone.title}
                 </h3>
                 <p className="text-xs md:text-sm text-[#F4F3EF]/75 max-w-lg leading-relaxed">
@@ -1484,7 +1588,7 @@ function UkusaApp() {
           ))}
         </div>
 
-        <div className="px-6 md:px-14 flex justify-between items-center font-mono text-[11px] tracking-[0.2em] text-[#F4F3EF]/45">
+        <div className="px-6 md:px-14 max-md:px-5 flex flex-wrap justify-between items-center gap-2 font-mono text-[11px] max-md:text-[10px] tracking-[0.2em] max-md:tracking-[0.14em] text-[#F4F3EF]/45">
           <span>ACOUSTICS BY DEVIALET & MCINTOSH</span>
           <span>NATURAL DAYLIGHT COEFFICIENT // 0.84</span>
         </div>
@@ -1493,35 +1597,35 @@ function UkusaApp() {
       {/* ==================================================================
           SECTION 6: SWISS-GRID FOOTER + TABLE RESERVATION + PHYSICS WORDMARK
          ================================================================== */}
-      <footer className="relative bg-[#0B0B0C] text-[#F4F3EF] border-t border-[#F4F3EF]/15 pt-20 pb-10 px-6 md:px-14">
+      <footer className="relative bg-[#0B0B0C] text-[#F4F3EF] border-t border-[#F4F3EF]/15 pt-20 max-md:pt-14 pb-10 max-md:pb-8 px-6 md:px-14 max-md:px-5">
         <div className="max-w-7xl mx-auto">
           {/* Swiss Grid Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-12 border border-[#F4F3EF]/15 rounded-3xl overflow-hidden mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-12 border border-[#F4F3EF]/15 rounded-3xl max-md:rounded-2xl overflow-hidden mb-16 max-md:mb-10">
             {/* Col 1: Sanctuary Location */}
-            <div className="md:col-span-4 p-8 md:p-10 border-b md:border-b-0 md:border-r border-[#F4F3EF]/15 flex flex-col justify-between">
+            <div className="md:col-span-4 p-8 md:p-10 max-md:p-6 border-b md:border-b-0 md:border-r border-[#F4F3EF]/15 flex flex-col justify-between">
               <div>
-                <span className="font-mono text-xs tracking-[0.2em] text-[#C85A32] uppercase block mb-4">
+                <span className="font-mono text-xs tracking-[0.2em] text-[#C85A32] uppercase block mb-4 max-md:mb-2">
                   01 // FLAGSHIP SANCTUARY
                 </span>
-                <h3 className="font-display text-2xl font-bold mb-3">
+                <h3 className="font-display text-2xl max-md:text-xl font-bold mb-3 max-md:mb-2">
                   428 Nakagyo-ku Basalt Lane
                 </h3>
-                <p className="text-sm text-[#F4F3EF]/65 leading-relaxed">
+                <p className="text-sm max-md:text-xs text-[#F4F3EF]/65 leading-relaxed">
                   Designed for slow mornings, vinyl listening sessions, and omakase coffee pairings.
                 </p>
               </div>
-              <div className="mt-8 pt-4 border-t border-[#F4F3EF]/10 font-mono text-xs text-[#D9B382]">
+              <div className="mt-8 max-md:mt-5 pt-4 border-t border-[#F4F3EF]/10 font-mono text-xs text-[#D9B382]">
                 35.0116° N, 135.7681° E
               </div>
             </div>
 
             {/* Col 2: Hours & Cuppings */}
-            <div className="md:col-span-4 p-8 md:p-10 border-b md:border-b-0 md:border-r border-[#F4F3EF]/15 flex flex-col justify-between">
+            <div className="md:col-span-4 p-8 md:p-10 max-md:p-6 border-b md:border-b-0 md:border-r border-[#F4F3EF]/15 flex flex-col justify-between">
               <div>
-                <span className="font-mono text-xs tracking-[0.2em] text-[#C85A32] uppercase block mb-4">
+                <span className="font-mono text-xs tracking-[0.2em] text-[#C85A32] uppercase block mb-4 max-md:mb-2">
                   02 // EXTRACTION HOURS
                 </span>
-                <ul className="space-y-3 font-mono text-xs">
+                <ul className="space-y-3 max-md:space-y-2 font-mono text-xs">
                   <li className="flex justify-between">
                     <span className="text-[#F4F3EF]/60">MON – FRI</span>
                     <span>07:00 — 19:00</span>
@@ -1536,26 +1640,26 @@ function UkusaApp() {
                   </li>
                 </ul>
               </div>
-              <div className="mt-8 pt-4 border-t border-[#F4F3EF]/10 font-mono text-xs text-[#F4F3EF]/50">
+              <div className="mt-8 max-md:mt-5 pt-4 border-t border-[#F4F3EF]/10 font-mono text-xs text-[#F4F3EF]/50">
                 WALK-INS WELCOME · RESERVATIONS ADVISED
               </div>
             </div>
 
             {/* Col 3: Reserve Table CTA */}
-            <div className="md:col-span-4 p-8 md:p-10 bg-[#141416] flex flex-col justify-between">
+            <div className="md:col-span-4 p-8 md:p-10 max-md:p-6 bg-[#141416] flex flex-col justify-between">
               <div>
-                <span className="font-mono text-xs tracking-[0.2em] text-[#D9B382] uppercase block mb-4">
+                <span className="font-mono text-xs tracking-[0.2em] text-[#D9B382] uppercase block mb-4 max-md:mb-2">
                   03 // TABLE & OMAKASE BOOKING
                 </span>
-                <h3 className="font-display text-2xl font-bold mb-3">
+                <h3 className="font-display text-2xl max-md:text-xl font-bold mb-3 max-md:mb-2">
                   Experience the Pour-Over Bar.
                 </h3>
-                <p className="text-sm text-[#F4F3EF]/65 leading-relaxed mb-6">
+                <p className="text-sm max-md:text-xs text-[#F4F3EF]/65 leading-relaxed mb-6 max-md:mb-5">
                   Reserve seats at our 6-seat Bizen ceramic bar or the sunlit moss courtyard.
                 </p>
               </div>
 
-              <Magnetic strength={0.2} cursorLabel="RESERVE" cursorColor="#C85A32">
+              <Magnetic strength={0.2} cursorLabel="RESERVE" cursorColor="#C85A32" className="w-full">
                 <button
                   onClick={() => {
                     if (window.ukusaSound) window.ukusaSound.playClick();
@@ -1571,15 +1675,16 @@ function UkusaApp() {
           </div>
 
           {/* Interactive Cursor-Repelling Physics Wordmark */}
-          <div className="mb-8">
-            <p className="font-mono text-[10px] tracking-[0.25em] text-[#F4F3EF]/40 uppercase text-center mb-2">
-              SWEEP CURSOR ACROSS WORDMARK TO DISTORT FIELD
+          <div className="mb-8 max-md:mb-4">
+            <p className="font-mono text-[10px] tracking-[0.25em] max-md:tracking-[0.14em] text-[#F4F3EF]/40 uppercase text-center mb-2">
+              <span className="max-md:hidden">SWEEP CURSOR ACROSS WORDMARK TO DISTORT FIELD</span>
+              <span className="md:hidden">TOUCH WORDMARK TO DISTORT FIELD</span>
             </p>
             <PhysicsWordmark />
           </div>
 
           {/* Bottom Legal / Credits */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8 border-t border-[#F4F3EF]/10 font-mono text-xs text-[#F4F3EF]/45">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 max-md:gap-2 pt-8 max-md:pt-5 border-t border-[#F4F3EF]/10 font-mono text-xs max-md:text-[10px] text-center sm:text-left text-[#F4F3EF]/45">
             <span>© 2026 UKUSA SPECIALTY COFFEE & ROASTERY. ALL RIGHTS RESERVED.</span>
             <span>CRAFTED WITH WEBGL · THREE.JS · LENIS · GSAP</span>
           </div>
@@ -1588,12 +1693,17 @@ function UkusaApp() {
 
       {/* ==================================================================
           MODAL 1: DRINK / FOOD QUICK CUSTOMIZER
+          (Centered modal on desktop; full-width bottom sheet on mobile)
          ================================================================== */}
       {customizingItem && (
-        <div className="fixed inset-0 z-[3000] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#121214] border border-[#F4F3EF]/20 text-[#F4F3EF] rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl">
+        <div className="fixed inset-0 z-[3000] bg-black/80 backdrop-blur-md flex items-center max-md:items-end justify-center p-4 max-md:p-0">
+          <div className="bg-[#121214] border border-[#F4F3EF]/20 text-[#F4F3EF] rounded-3xl max-md:rounded-b-none max-md:rounded-t-2xl max-w-lg max-md:max-w-full w-full overflow-hidden max-md:max-h-[85vh] max-md:overflow-y-auto shadow-2xl">
+            {/* Mobile Bottom-Sheet Grab Pill */}
+            <div className="md:hidden w-full flex justify-center pt-2.5 pb-1 bg-[#121214]">
+              <span className="w-10 h-1 rounded-full bg-[#F4F3EF]/25" />
+            </div>
             {/* Top Image Banner */}
-            <div className="relative h-52 w-full">
+            <div className="relative h-52 max-md:h-44 w-full">
               <img
                 src={customizingItem.image}
                 alt={customizingItem.name}
@@ -1606,16 +1716,16 @@ function UkusaApp() {
               >
                 ✕
               </button>
-              <div className="absolute bottom-4 left-6 right-6">
+              <div className="absolute bottom-4 left-6 right-6 max-md:left-5 max-md:right-5">
                 <span className="font-mono text-[10px] tracking-[0.2em] text-[#D9B382] uppercase">
                   {customizingItem.code} · {customizingItem.origin}
                 </span>
-                <h3 className="font-display text-2xl font-extrabold">{customizingItem.name}</h3>
+                <h3 className="font-display text-2xl max-md:text-xl font-extrabold">{customizingItem.name}</h3>
               </div>
             </div>
 
             {/* Customizer Options Body */}
-            <div className="p-6 space-y-6">
+            <div className="p-6 max-md:p-5 space-y-6 max-md:space-y-5">
               {customizingItem.isDrink ? (
                 <>
                   {/* Temperature Selection */}
@@ -1629,7 +1739,7 @@ function UkusaApp() {
                           <button
                             key={t}
                             onClick={() => setCustomOptions((p) => ({ ...p, temp: t }))}
-                            className={`py-2.5 rounded-xl font-mono text-xs border transition-all ${
+                            className={`py-2.5 max-md:py-3 rounded-xl font-mono text-xs border transition-all ${
                               customOptions.temp === t
                                 ? "border-[#C85A32] bg-[#C85A32]/20 text-[#F4F3EF] font-bold"
                                 : "border-[#F4F3EF]/15 text-[#F4F3EF]/60"
@@ -1659,7 +1769,7 @@ function UkusaApp() {
                           onClick={() =>
                             setCustomOptions((p) => ({ ...p, milk: m.label, milkCost: m.cost }))
                           }
-                          className={`py-2.5 px-3 rounded-xl font-mono text-[11px] border text-left transition-all ${
+                          className={`py-2.5 max-md:py-3 px-3 rounded-xl font-mono text-[11px] border text-left transition-all ${
                             customOptions.milk === m.label
                               ? "border-[#C85A32] bg-[#C85A32]/20 text-[#F4F3EF] font-bold"
                               : "border-[#F4F3EF]/15 text-[#F4F3EF]/60"
@@ -1733,18 +1843,23 @@ function UkusaApp() {
       )}
 
       {/* ==================================================================
-          MODAL 2: SLIDE-OUT LIVE ORDER BAG (CART DRAWER)
+          MODAL 2: SLIDE-OUT LIVE ORDER BAG (CART DRAWER ON DESKTOP,
+          BOTTOM SHEET ON MOBILE)
          ================================================================== */}
       {cartOpen && (
-        <div className="fixed inset-0 z-[3500] bg-black/75 backdrop-blur-sm flex justify-end">
-          <div className="w-full max-w-md bg-[#0B0B0C] border-l border-[#F4F3EF]/15 h-full flex flex-col justify-between p-6 md:p-8 text-[#F4F3EF] shadow-2xl">
+        <div className="fixed inset-0 z-[3500] bg-black/75 backdrop-blur-sm flex justify-end max-md:items-end">
+          <div className="w-full max-w-md max-md:max-w-full bg-[#0B0B0C] border-l max-md:border-l-0 max-md:border-t border-[#F4F3EF]/15 h-full max-md:h-auto max-md:max-h-[85vh] max-md:rounded-t-2xl flex flex-col justify-between p-6 md:p-8 max-md:p-5 text-[#F4F3EF] shadow-2xl">
+            {/* Mobile Bottom-Sheet Grab Pill */}
+            <div className="md:hidden w-full flex justify-center pb-3">
+              <span className="w-10 h-1 rounded-full bg-[#F4F3EF]/25" />
+            </div>
             {/* Drawer Header */}
-            <div className="flex justify-between items-center pb-6 border-b border-[#F4F3EF]/15">
+            <div className="flex justify-between items-center pb-6 max-md:pb-4 border-b border-[#F4F3EF]/15">
               <div>
                 <span className="font-mono text-[10px] tracking-[0.22em] text-[#C85A32] uppercase block">
                   LIVE EXTRACTION QUEUE
                 </span>
-                <h3 className="font-display text-2xl font-extrabold">
+                <h3 className="font-display text-2xl max-md:text-xl font-extrabold">
                   YOUR ORDER BAG ({cartCount})
                 </h3>
               </div>
@@ -1757,7 +1872,7 @@ function UkusaApp() {
             </div>
 
             {/* Cart Items List */}
-            <div className="flex-1 overflow-y-auto py-6 space-y-5">
+            <div className="flex-1 overflow-y-auto py-6 max-md:py-4 space-y-5 max-md:space-y-3.5">
               {orderCheckedOut ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 border border-[#D9B382]/30 rounded-3xl bg-[#141416]">
                   <div className="w-14 h-14 rounded-full bg-[#C85A32] text-[#F4F3EF] flex items-center justify-center font-mono text-2xl mb-4">
@@ -1783,7 +1898,7 @@ function UkusaApp() {
                   </button>
                 </div>
               ) : cart.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center text-[#F4F3EF]/50 font-mono text-xs">
+                <div className="h-full max-md:py-10 flex flex-col items-center justify-center text-center text-[#F4F3EF]/50 font-mono text-xs">
                   <p className="mb-4">YOUR ORDER BAG IS EMPTY.</p>
                   <button
                     onClick={() => setCartOpen(false)}
@@ -1796,24 +1911,24 @@ function UkusaApp() {
                 cart.map((item) => (
                   <div
                     key={item.cartId}
-                    className="flex gap-4 p-4 rounded-2xl bg-[#141417] border border-[#F4F3EF]/10"
+                    className="flex gap-4 p-4 max-md:p-3.5 rounded-2xl bg-[#141417] border border-[#F4F3EF]/10"
                   >
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-20 h-20 rounded-xl object-cover flex-shrink-0"
+                      className="w-20 h-20 max-md:w-16 max-md:h-16 rounded-xl object-cover flex-shrink-0"
                     />
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
                         <div className="flex justify-between items-start gap-2">
-                          <h4 className="font-display font-bold text-base leading-snug">
+                          <h4 className="font-display font-bold text-base max-md:text-sm leading-snug">
                             {item.name}
                           </h4>
                           <span className="font-mono text-sm font-bold text-[#D9B382]">
                             ${(item.price * item.qty).toFixed(2)}
                           </span>
                         </div>
-                        <p className="font-mono text-[11px] text-[#F4F3EF]/55 mt-1">
+                        <p className="font-mono text-[11px] max-md:text-[10px] text-[#F4F3EF]/55 mt-1">
                           {item.details}
                         </p>
                       </div>
@@ -1822,14 +1937,14 @@ function UkusaApp() {
                         <div className="flex items-center gap-3 bg-[#0B0B0C] px-3 py-1 rounded-full border border-[#F4F3EF]/15 font-mono text-xs">
                           <button
                             onClick={() => updateCartQty(item.cartId, -1)}
-                            className="hover:text-[#C85A32]"
+                            className="hover:text-[#C85A32] max-md:px-1"
                           >
                             −
                           </button>
                           <span>{item.qty}</span>
                           <button
                             onClick={() => updateCartQty(item.cartId, 1)}
-                            className="hover:text-[#C85A32]"
+                            className="hover:text-[#C85A32] max-md:px-1"
                           >
                             +
                           </button>
@@ -1850,7 +1965,7 @@ function UkusaApp() {
 
             {/* Drawer Footer Subtotal & Checkout */}
             {!orderCheckedOut && cart.length > 0 && (
-              <div className="pt-6 border-t border-[#F4F3EF]/15 space-y-4">
+              <div className="pt-6 max-md:pt-4 border-t border-[#F4F3EF]/15 space-y-4 max-md:space-y-3">
                 <div className="flex justify-between items-center font-mono text-xs text-[#F4F3EF]/60">
                   <span>HOSPITALITY & SERVICE</span>
                   <span>INCLUDED</span>
@@ -1859,7 +1974,7 @@ function UkusaApp() {
                   <span className="font-mono text-xs tracking-[0.2em] uppercase">
                     LIVE SUBTOTAL
                   </span>
-                  <span className="font-mono text-3xl font-extrabold text-[#F4F3EF]">
+                  <span className="font-mono text-3xl max-md:text-2xl font-extrabold text-[#F4F3EF]">
                     ${cartSubtotal.toFixed(2)}
                   </span>
                 </div>
@@ -1881,16 +1996,21 @@ function UkusaApp() {
 
       {/* ==================================================================
           MODAL 3: INTERACTIVE TABLE RESERVATION MODAL
+          (Centered modal on desktop; full-width bottom sheet on mobile)
          ================================================================== */}
       {reserveOpen && (
-        <div className="fixed inset-0 z-[3500] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#121215] border border-[#F4F3EF]/20 text-[#F4F3EF] rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl">
-            <div className="flex justify-between items-start mb-6">
+        <div className="fixed inset-0 z-[3500] bg-black/80 backdrop-blur-md flex items-center max-md:items-end justify-center p-4 max-md:p-0">
+          <div className="bg-[#121215] border border-[#F4F3EF]/20 text-[#F4F3EF] rounded-3xl max-md:rounded-b-none max-md:rounded-t-2xl max-w-lg max-md:max-w-full w-full p-6 md:p-8 max-md:p-5 max-md:max-h-[85vh] max-md:overflow-y-auto shadow-2xl">
+            {/* Mobile Bottom-Sheet Grab Pill */}
+            <div className="md:hidden w-full flex justify-center pb-3">
+              <span className="w-10 h-1 rounded-full bg-[#F4F3EF]/25" />
+            </div>
+            <div className="flex justify-between items-start mb-6 max-md:mb-4">
               <div>
                 <span className="font-mono text-[10px] tracking-[0.22em] text-[#C85A32] uppercase block">
                   SANCTUARY SEATING
                 </span>
-                <h3 className="font-display text-2xl md:text-3xl font-extrabold">
+                <h3 className="font-display text-2xl md:text-3xl max-md:text-xl font-extrabold">
                   RESERVE A TABLE
                 </h3>
               </div>
