@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UKUSA — Specialty Coffee, Ceremonial Matcha & Sensory Roastery</title>
+
+  <!-- Google Fonts: Syne (Kinetic Display), Space Grotesk (Body), JetBrains Mono (Micro-labels & Telemetry) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Syne"', '"Space Grotesk"', 'sans-serif'],
+            sans: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            charcoal: '#0B0B0C',
+            bone: '#F4F3EF',
+            terracotta: '#C85A32',
+            crema: '#D9B382'
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #0B0B0C;
+      color: #F4F3EF;
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Subtle editorial film grain overlay */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9000;
+      opacity: 0.032;
+      background-image: radial-gradient(#F4F3EF 0.75px, transparent 0.75px);
+      background-size: 4px 4px;
+    }
+
+    /* Custom Tactile Range Sliders for "Find Your Brew" */
+    .ukusa-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: rgba(244, 243, 239, 0.14);
+      border-radius: 999px;
+      outline: none;
+      cursor: pointer;
+    }
+    .ukusa-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #C85A32;
+      border: 3px solid #F4F3EF;
+      box-shadow: 0 4px 16px rgba(200, 90, 50, 0.65);
+      cursor: grab;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+    .ukusa-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+      background: #D9B382;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0B0C;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2C2A29;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #C85A32;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Three.js (WebGL Liquid Espresso & Crema Shader Playground) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- GSAP + ScrollTrigger (Word-by-Word Scrubbing & Horizontal Scroll Pinning) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Lenis Smooth Inertial Scrolling -->
+  <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
+  <!-- React 18 & Babel Standalone -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Ukusa Modules -->
+  <script src="./data.js"></script>
+  <script src="./webgl-audio.js"></script>
+  <script type="text/babel" src="./app.jsx"></script>
+</body>
+</html>
